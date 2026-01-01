@@ -1,6 +1,7 @@
 // import PatientPage from "@/modules/patients/pages/PatientPage";
 import { RouteObject } from "react-router";
 import { MainLayout } from "@/layouts/MainLayout";
+import PatientListPage from "@/modules/patients/pages/PatientListPage";
 
 // export const routes = [
 //   {
@@ -22,7 +23,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: "patients",
-        element: <div>Patients</div>,
+        element: <PatientListPage />,
       },
       // {path: 'patients', element: <PatientPage/>}
       // {path: 'staff', element: <StaffPage />}

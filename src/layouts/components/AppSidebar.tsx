@@ -18,12 +18,9 @@ export function AppSidebar() {
       collapsed={collapsed}
       onCollapse={toggle}
       width={240}
-      className="bg-gray-900! text-white"
+      className="bg-gray-900! text-white min-h-screen"
+      collapsedWidth={80}
     >
-      <div className="h-14 flex items-center justify-center text-white font-semibold">
-        ACM HMS
-      </div>
-
       <Menu
         mode="inline"
         items={mapItems(sidebarItems)}
