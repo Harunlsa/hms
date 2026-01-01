@@ -19,11 +19,10 @@ export function AppSidebar() {
       onCollapse={toggle}
       width={240}
       className="bg-gray-900! text-white"
-      collapsedWidth={80}
     >
-      {/* <div className="h-14 flex items-center justify-center text-white font-semibold">
-        HMS
-      </div> */}
+      <div className="h-14 flex items-center justify-center text-white font-semibold">
+        ACM HMS
+      </div>
 
       <Menu
         mode="inline"

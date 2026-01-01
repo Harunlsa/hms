@@ -5,7 +5,6 @@ import { ConfigProvider } from "antd";
 import { getAntdTheme } from "@/styles/antd-theme";
 import { RouterProvider } from "react-router";
 import { router } from "./app/router";
-// import { router } from "@/app/routes";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
