@@ -6,7 +6,10 @@ const { Content } = Layout;
 
 export function MainLayout() {
   return (
-    <Layout className="min-h-screen">
+    <Layout
+      className="min-h-screen"
+      // style={{ outline: "2px solid red", minHeight: "100vh" }}
+    >
       <AppSidebar />
       <Layout>
         <Content className="p-lg">
