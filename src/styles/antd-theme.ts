@@ -1,4 +1,6 @@
-export function getAntdTheme() {
+import { ThemeConfig } from "antd";
+
+export function getAntdTheme(): ThemeConfig {
   const styles = getComputedStyle(document.documentElement);
 
   return {
@@ -17,6 +19,13 @@ export function getAntdTheme() {
       padding: 16,
       paddingSM: 8,
       paddingLG: 24,
+    },
+    components: {
+      Layout: {
+        headerBg: "#ffffff",
+        headerColor: "#1f2937",
+        headerHeight: 56,
+      },
     },
   };
 }

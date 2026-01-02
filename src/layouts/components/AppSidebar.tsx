@@ -14,18 +14,22 @@ export function AppSidebar() {
 
   return (
     <Sider
+      theme="light"
       collapsible
       collapsed={collapsed}
       onCollapse={toggle}
-      width={240}
-      className="bg-gray-900! text-white min-h-screen"
+      // width={240}
+      className="bg-gray-900! text-white! min-h-screen "
       collapsedWidth={80}
     >
       <Menu
         mode="inline"
+        theme="light"
         items={mapItems(sidebarItems)}
         selectedKeys={[location.pathname]}
         onClick={({ key }) => navigate(key)}
+        className="text-white! min-h-screen"
+        style={{ height: "100%" }}
       />
     </Sider>
   );

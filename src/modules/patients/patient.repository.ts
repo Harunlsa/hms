@@ -1,4 +1,3 @@
-// import { Patient } from "./patient.types";
 import { Patient } from "./types/patient.types";
 
 export interface PatientRepository {
