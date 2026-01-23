@@ -3,6 +3,7 @@ import {
   FileTextOutlined,
   TeamOutlined,
   UserOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 // import type { MenuProps } from "antd";
@@ -16,6 +17,12 @@ export interface SidebarItem {
 }
 
 export const sidebarItems: SidebarItem[] = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    icon: HomeOutlined,
+    path: "/",
+  },
   {
     key: "patients",
     label: "Patients",

@@ -45,7 +45,7 @@ export function Topbar({
       {showSearch && (
         <div className="min-w-2xs max-w-96  flex-1 px-6">
           <Input.Search
-            placeholder="Search patients..."
+            placeholder="Search..."
             allowClear
             onSearch={onSearch}
           />

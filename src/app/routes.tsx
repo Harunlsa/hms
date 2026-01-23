@@ -20,10 +20,12 @@ export const routes: RouteObject[] = [
       {
         index: true,
         element: <div>Dashboard</div>,
+        handle: { title: "Dashboard" },
       },
       {
-        path: "patients",
+        path: "/patients",
         element: <PatientListPage />,
+        handle: { title: "Patients" },
       },
       // {path: 'patients', element: <PatientPage/>}
       // {path: 'staff', element: <StaffPage />}
