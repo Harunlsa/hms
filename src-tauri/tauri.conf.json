@@ -1,21 +1,22 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tauri-app",
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "hms",
   "version": "0.1.0",
-  "identifier": "com.hlabdulwahab.tauri-app",
+  "identifier": "com.tauri.dev",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "frontendDist": "../src",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [
       {
         "title": "HMS",
-        "width": 1000,
-        "height": 750,
-        "minWidth": 900
+        "width": 960,
+        "height": 720,
+        "resizable": true,
+        "fullscreen": false
       }
     ],
     "security": {
