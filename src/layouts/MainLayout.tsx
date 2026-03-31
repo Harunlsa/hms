@@ -15,7 +15,9 @@ function useRouteTitle() {
     .reverse()
     .find(
       (m): m is typeof m & { handle: RouteHandle } =>
-        typeof m.handle === "object" && m.handle !== null && "title" in m.handle
+        typeof m.handle === "object" &&
+        m.handle !== null &&
+        "title" in m.handle,
     );
 
   return lastMatch?.handle.title ?? "HMS";
@@ -41,7 +43,7 @@ export function MainLayout() {
       <AppSidebar />
       <Layout>
         <Topbar title={title} user={user} showSearch />
-        <Content className="p-lg">
+        <Content className="p-lg overflow-y-scroll">
           <Outlet />
         </Content>
       </Layout>

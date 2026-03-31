@@ -2,6 +2,7 @@
 import { RouteObject } from "react-router";
 import { MainLayout } from "@/layouts/MainLayout";
 import PatientListPage from "@/modules/patients/pages/PatientListPage";
+import PatientPage from "@/modules/patients/pages/PatientPage";
 
 // export const routes = [
 //   {
@@ -26,6 +27,11 @@ export const routes: RouteObject[] = [
         path: "/patients",
         element: <PatientListPage />,
         handle: { title: "Patients" },
+      },
+      {
+        path: "/patients/:id",
+        element: <PatientPage />,
+        handle: { title: "Patient Profile" },
       },
       // {path: 'patients', element: <PatientPage/>}
       // {path: 'staff', element: <StaffPage />}
