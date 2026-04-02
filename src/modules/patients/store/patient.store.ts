@@ -7,6 +7,8 @@ import {
 } from "../types/patient.types";
 import { patientMockRepo } from "../patient.mock";
 import { PatientSearchParams } from "../patient.repository";
+import { FamilyFile } from "../types/family-file.types";
+import { familyFileMockRepo } from "../family-file.mock";
 
 // Hardcoded actor until the auth store is wired up
 const CURRENT_ACTOR = { id: "usr-001", name: "Dr Hugh Mann" };
@@ -19,6 +21,9 @@ interface PatientState {
   error: string | null;
   searchQuery: string;
   statusFilter: PatientStatus | "all";
+
+  familyFileResults: FamilyFile[];
+  familyFileSearching: boolean;
 
   // Actions
   fetchAll: (params?: PatientSearchParams) => Promise<void>;
@@ -41,6 +46,8 @@ export const usePatientStore = create<PatientState>((set, get) => ({
   error: null,
   searchQuery: "",
   statusFilter: "all",
+  familyFileResults: [],
+  familyFileSearching: false,
 
   fetchAll: async (params) => {
     set({ loading: true, error: null });
@@ -140,4 +147,16 @@ export const usePatientStore = create<PatientState>((set, get) => ({
   },
 
   clearSelected: () => set({ selectedPatient: null }),
+
+  searchFamilyFiles: async (query: any) => {
+    set({ familyFileSearching: true });
+    try {
+      const results = query.trim()
+        ? await familyFileMockRepo.search(query)
+        : await familyFileMockRepo.getAll();
+      set({ familyFileResults: results });
+    } finally {
+      set({ familyFileSearching: false });
+    }
+  },
 }));

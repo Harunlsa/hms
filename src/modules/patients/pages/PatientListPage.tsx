@@ -15,7 +15,8 @@ import { useNavigate } from "react-router";
 import type { TableProps } from "antd";
 import { Patient, PatientStatus } from "../types/patient.types";
 import { usePatientStore } from "../store/patient.store";
-import { RegisterPatientDrawer } from "../components/RegisterPatientDrawer";
+// import { RegisterPatientDrawer } from "../components/RegisterPatientDrawer";
+import { RegisterPatientModal } from "../components/RegisterPatientModal";
 
 const { Column } = Table;
 
@@ -110,7 +111,7 @@ export default function PatientListPage() {
           marginBottom: 16,
         }}
       >
-        <Typography.Title level={4} style={{ margin: 0 }}>
+        {/* <Typography.Title level={4} style={{ margin: 0 }}>
           Patients
           <Badge
             count={patients.length}
@@ -118,19 +119,20 @@ export default function PatientListPage() {
             color="blue"
             style={{ marginLeft: 8 }}
           />
-        </Typography.Title>
+        </Typography.Title> */}
+        <div></div>
 
-        <Button
+        {/* <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setRegisterOpen(true)}
         >
           Register Patient
-        </Button>
+        </Button> */}
       </div>
 
       {/* ── Filters ── */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+      <div className="flex gap-3 mb-4">
         <Input
           prefix={<SearchOutlined />}
           placeholder="Search by name, file number, or phone…"
@@ -150,6 +152,15 @@ export default function PatientListPage() {
             { value: "archived", label: "Archived" },
           ]}
         />
+        <div className="ml-auto">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setRegisterOpen(true)}
+          >
+            Register Patient
+          </Button>
+        </div>
       </div>
 
       {/* ── Table ── */}
@@ -159,6 +170,16 @@ export default function PatientListPage() {
           dataIndex="fileNumber"
           key="fileNumber"
           width={100}
+          render={(fn: string, r: Patient) => (
+            <div>
+              <span className="font-mono text-sm">{fn}</span>
+              {r.fileType === "family" && r.familyFileNumber && (
+                <Tag color="purple" className="ml-1 text-xs">
+                  {r.familyFileNumber}
+                </Tag>
+              )}
+            </div>
+          )}
         />
         <Column
           title="Name"
@@ -219,12 +240,23 @@ export default function PatientListPage() {
       </Table>
 
       {/* ── Register Drawer ── */}
-      <RegisterPatientDrawer
+      {/* <RegisterPatientDrawer
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
         onSuccess={(patient) => {
           messageApi.success(
             `Patient "${patient.name}" registered successfully (File #${patient.fileNumber})`,
+          );
+          navigate(`/patients/${patient.id}`);
+        }}
+      /> */}
+
+      <RegisterPatientModal
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSuccess={(patient) => {
+          messageApi.success(
+            `"${patient.name}" registered — File #${patient.fileNumber}`,
           );
           navigate(`/patients/${patient.id}`);
         }}

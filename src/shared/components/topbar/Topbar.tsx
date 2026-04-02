@@ -7,6 +7,7 @@ const { Header } = Layout;
 
 export function Topbar({
   title,
+  titleBadge,
   user,
   status = "online",
   showSearch = false,
@@ -39,6 +40,14 @@ export function Topbar({
       {/* Left */}
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-semibold mb-0!">{title}</h1>
+        {titleBadge !== undefined && (
+          <Badge
+            count={titleBadge}
+            showZero
+            color="#3b82f6"
+            overflowCount={999}
+          />
+        )}
       </div>
 
       {/* Centre */}
@@ -60,8 +69,8 @@ export function Topbar({
             status === "online"
               ? "bg-green-500"
               : status === "syncing"
-              ? "bg-yellow-500"
-              : "bg-red-500"
+                ? "bg-yellow-500"
+                : "bg-red-500"
           }`}
           title={status}
         />

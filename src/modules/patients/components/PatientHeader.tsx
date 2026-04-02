@@ -110,6 +110,9 @@ export function PatientHeader({ patient, onEditClick }: Props) {
             <Tag color={STATUS_COLOR[patient.status]}>
               {patient.status[0].toUpperCase() + patient.status.slice(1)}
             </Tag>
+            {patient.fileType === "family" && patient.familyFileNumber && (
+              <Tag color="purple">Family: {patient.familyFileNumber}</Tag>
+            )}
           </Space>
 
           {/* <Space size={16} style={{ marginTop: 4, marginLeft: 16 }} wrap>
