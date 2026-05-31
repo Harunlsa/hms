@@ -13,14 +13,7 @@ interface Props {
 
 function ComingSoon({ label }: { label: string }) {
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 8,
-        padding: 48,
-        textAlign: "center",
-      }}
-    >
+    <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
       <Empty
         description={
           <Typography.Text type="secondary">
@@ -78,5 +71,5 @@ export function PatientTabs({
     },
   ];
 
-  return <Tabs items={items} destroyInactiveTabPane={false} />;
+  return <Tabs items={items} destroyOnHidden={false} />;
 }

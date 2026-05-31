@@ -5,12 +5,11 @@ import {
   RegisterPatientInput,
   UpdatePatientInput,
 } from "../types/patient.types";
-import { patientMockRepo } from "../patient.mock";
-import { PatientSearchParams } from "../patient.repository";
 import { FamilyFile } from "../types/family-file.types";
+import { patientMockRepo } from "../patient.mock";
 import { familyFileMockRepo } from "../family-file.mock";
+import { PatientSearchParams } from "../patient.repository";
 
-// Hardcoded actor until the auth store is wired up
 const CURRENT_ACTOR = { id: "usr-001", name: "Dr Hugh Mann" };
 
 interface PatientState {
@@ -22,8 +21,12 @@ interface PatientState {
   searchQuery: string;
   statusFilter: PatientStatus | "all";
 
+  // Family file state
   familyFileResults: FamilyFile[];
   familyFileSearching: boolean;
+
+  // File number suggestion
+  nextFileNumber: string;
 
   // Actions
   fetchAll: (params?: PatientSearchParams) => Promise<void>;
@@ -36,6 +39,9 @@ interface PatientState {
   setSearchQuery: (query: string) => void;
   setStatusFilter: (status: PatientStatus | "all") => void;
   clearSelected: () => void;
+  searchFamilyFiles: (query: string) => Promise<void>;
+  fetchNextFileNumber: () => Promise<void>;
+  isFileNumberTaken: (fileNumber: string) => Promise<boolean>;
 }
 
 export const usePatientStore = create<PatientState>((set, get) => ({
@@ -48,6 +54,7 @@ export const usePatientStore = create<PatientState>((set, get) => ({
   statusFilter: "all",
   familyFileResults: [],
   familyFileSearching: false,
+  nextFileNumber: "",
 
   fetchAll: async (params) => {
     set({ loading: true, error: null });
@@ -85,7 +92,6 @@ export const usePatientStore = create<PatientState>((set, get) => ({
         data.dateOfBirth,
       );
       const patient = await patientMockRepo.create(data, CURRENT_ACTOR);
-      // Refresh list
       await get().fetchAll();
       return { patient, duplicate };
     } catch (e) {
@@ -138,17 +144,11 @@ export const usePatientStore = create<PatientState>((set, get) => ({
     }
   },
 
-  setSearchQuery: (query) => {
-    set({ searchQuery: query });
-  },
-
-  setStatusFilter: (status) => {
-    set({ statusFilter: status });
-  },
-
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setStatusFilter: (status) => set({ statusFilter: status }),
   clearSelected: () => set({ selectedPatient: null }),
 
-  searchFamilyFiles: async (query: any) => {
+  searchFamilyFiles: async (query) => {
     set({ familyFileSearching: true });
     try {
       const results = query.trim()
@@ -158,5 +158,13 @@ export const usePatientStore = create<PatientState>((set, get) => ({
     } finally {
       set({ familyFileSearching: false });
     }
+  },
+
+  fetchNextFileNumber: async () => {
+    const next = await patientMockRepo.getNextFileNumber();
+    set({ nextFileNumber: next });
+  },
+  isFileNumberTaken: async (fileNumber) => {
+    return patientMockRepo.isFileNumberTaken(fileNumber);
   },
 }));

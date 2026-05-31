@@ -1,14 +1,10 @@
 import {
   Button,
-  Card,
-  Col,
   DatePicker,
   Descriptions,
   Form,
   Input,
-  Row,
   Select,
-  Space,
   Typography,
   message,
 } from "antd";
@@ -16,13 +12,13 @@ import {
   EditOutlined,
   SaveOutlined,
   CloseOutlined,
-  DeleteOutlined,
   PlusOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { EmergencyContact, Patient } from "../types/patient.types";
 import { usePatientStore } from "../store/patient.store";
-import { useEffect, useState } from "react";
 
 const { Text } = Typography;
 
@@ -40,9 +36,6 @@ interface FormValues {
   phone: string;
   email?: string;
   address?: string;
-  // emergencyName?: string;
-  // emergencyPhone?: string;
-  // emergencyRelationship?: string;
 }
 
 const RELATIONSHIPS = [
@@ -62,11 +55,6 @@ function formatDob(iso: string) {
   });
 }
 
-function calcAge(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  return Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
-}
-
 export function OverviewTab({
   patient,
   editing,
@@ -81,6 +69,8 @@ export function OverviewTab({
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
 
   // ── Sync form values whenever editing becomes true ─────────────────────────
+  // This is the fix for the blank form bug: we always hydrate from the
+  // latest patient data whenever the editing panel opens.
   useEffect(() => {
     if (editing) {
       form.setFieldsValue({
@@ -116,21 +106,7 @@ export function OverviewTab({
       prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
     );
 
-  // const openEdit = () => {
-  //   form.setFieldsValue({
-  //     name: patient.name,
-  //     dateOfBirth: patient.dateOfBirth ? dayjs(patient.dateOfBirth) : undefined,
-  //     gender: patient.gender,
-  //     phone: patient.phone,
-  //     email: patient.email,
-  //     address: patient.address,
-  //     emergencyName: patient.emergencyContact?.name,
-  //     emergencyPhone: patient.emergencyContact?.phone,
-  //     emergencyRelationship: patient.emergencyContact?.relationship,
-  //   });
-  //   onEditOpen();
-  // };
-
+  // ── Save ───────────────────────────────────────────────────────────────────
   const handleSave = async (values: FormValues) => {
     try {
       await update(patient.id, {
@@ -263,11 +239,12 @@ export function OverviewTab({
                     className="bg-gray-50 border border-gray-200 rounded-lg p-4 relative"
                   >
                     <button
+                      title="delete"
                       type="button"
                       onClick={() => removeContact(contact.id)}
                       className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors"
                     >
-                      <DeleteOutlined />b
+                      <DeleteOutlined />
                     </button>
                     <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-3">
                       Contact {idx + 1}
@@ -322,7 +299,7 @@ export function OverviewTab({
     );
   }
 
-  // ── Read-only view ───────────────────────────────────────────────────────────
+  // ── Read-only view ─────────────────────────────────────────────────────────
   return (
     <>
       {contextHolder}
@@ -373,20 +350,13 @@ export function OverviewTab({
               size="small"
               className="[&_.ant-descriptions-item-label]:text-gray-500"
             >
-              <Descriptions.Item label="File #">
-                <span className="font-mono">#{patient.fileNumber}</span>
-              </Descriptions.Item>
+              {patient.fileNumber && (
+                <Descriptions.Item label="File #">
+                  <span className="font-mono">#{patient.fileNumber}</span>
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="Type">
-                {patient.fileType === "family" ? (
-                  <span>
-                    Family{" "}
-                    <span className="text-gray-400 text-xs">
-                      ({patient.familyFileNumber})
-                    </span>
-                  </span>
-                ) : (
-                  "Individual"
-                )}
+                {patient.fileType === "family" ? "Family" : "Individual"}
               </Descriptions.Item>
               <Descriptions.Item label="Registered">
                 {new Date(patient.createdAt).toLocaleDateString("en-GB", {

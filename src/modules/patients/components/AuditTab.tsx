@@ -55,11 +55,11 @@ export function AuditTab({ auditLog }: Props) {
       title: "Changes",
       key: "changes",
       render: (_: unknown, record: AuditEntry) => {
-        if (!record.changes || Object.keys(record.changes).length === 0) {
+        if (!record.changes || Object.keys(record.changes).length === 0)
           return <Text type="secondary">—</Text>;
-        }
+
         return (
-          <ul style={{ margin: 0, paddingLeft: 16 }}>
+          <ul className="m-0 pl-4 text-xs">
             {Object.entries(record.changes).map(([field, { from, to }]) => (
               <li key={field} style={{ fontSize: 12 }}>
                 <Text strong>{field}</Text>:{" "}
@@ -75,13 +75,15 @@ export function AuditTab({ auditLog }: Props) {
   ];
 
   return (
-    <Table<AuditEntry>
-      columns={columns}
-      dataSource={[...auditLog].reverse()}
-      rowKey="id"
-      size="small"
-      pagination={{ pageSize: 20, showSizeChanger: false }}
-      locale={{ emptyText: "No audit entries found." }}
-    />
+    <div className="bg-white rounded-lg border border-gray-200">
+      <Table<AuditEntry>
+        columns={columns}
+        dataSource={[...auditLog].reverse()}
+        rowKey="id"
+        size="small"
+        pagination={{ pageSize: 20, showSizeChanger: false }}
+        locale={{ emptyText: "No audit entries found." }}
+      />
+    </div>
   );
 }

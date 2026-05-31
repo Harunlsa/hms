@@ -56,13 +56,17 @@ export function RegisterPatientDrawer({ open, onClose, onSuccess }: Props) {
       phone: values.phone.trim(),
       email: values.email?.trim() || undefined,
       address: values.address?.trim() || undefined,
-      emergencyContact: values.emergencyName
-        ? {
-            name: values.emergencyName.trim(),
-            phone: values.emergencyPhone?.trim() ?? "",
-            relationship: values.emergencyRelationship?.trim() ?? "",
-          }
-        : undefined,
+      emergencyContacts: values.emergencyName
+        ? [
+            {
+              name: values.emergencyName.trim(),
+              phone: values.emergencyPhone?.trim() ?? "",
+              relationship: values.emergencyRelationship?.trim() ?? "",
+            },
+          ]
+        : [],
+      fileType: "individual",
+      fileNumber: "", // In a real scenario, this would be fetched or generated
     };
 
     try {

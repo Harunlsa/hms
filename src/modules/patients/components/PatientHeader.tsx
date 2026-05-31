@@ -19,8 +19,9 @@ const STATUS_COLOR: Record<PatientStatus, string> = {
 };
 
 function calcAge(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  return Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
+  return Math.floor(
+    (Date.now() - new Date(iso).getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+  );
 }
 
 function formatDob(iso: string) {
@@ -59,10 +60,6 @@ export function PatientHeader({ patient, onEditClick }: Props) {
     },
   ];
 
-  const handleStatusChange: MenuProps["onClick"] = ({ key }) => {
-    setStatus(patient.id, key as PatientStatus);
-  };
-
   const avatarColor = patient.gender === "female" ? "#c084fc" : "#60a5fa";
   const initials = patient.name
     .split(" ")
@@ -72,27 +69,17 @@ export function PatientHeader({ patient, onEditClick }: Props) {
     .toUpperCase();
 
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 8,
-        padding: "20px 24px",
-        marginBottom: 16,
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-      }}
-    >
-      {/* Back link */}
-      <Button
-        type="link"
-        icon={<ArrowLeftOutlined />}
+    <div className="bg-white rounded-lg px-6 py-5 mb-4 shadow-sm">
+      <button
+        type="button"
         onClick={() => navigate("/patients")}
-        style={{ padding: 0, marginBottom: 12, color: "#6b7280" }}
+        className="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-3 transition-colors"
       >
-        All Patients
-      </Button>
+        <ArrowLeftOutlined />
+        <span>All Patients</span>
+      </button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        {/* Avatar */}
+      <div className="flex items-center gap-4">
         <Avatar
           size={64}
           style={{ backgroundColor: avatarColor, fontSize: 22, flexShrink: 0 }}
@@ -101,44 +88,54 @@ export function PatientHeader({ patient, onEditClick }: Props) {
           {initials}
         </Avatar>
 
-        {/* Info */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 min-w-0">
           <Space align="center" size={8} wrap>
-            <Title level={4} style={{ margin: 0 }}>
+            <Title level={4} className="mb-0!">
               {patient.name}
             </Title>
             <Tag color={STATUS_COLOR[patient.status]}>
               {patient.status[0].toUpperCase() + patient.status.slice(1)}
             </Tag>
-            {patient.fileType === "family" && patient.familyFileNumber && (
-              <Tag color="purple">Family: {patient.familyFileNumber}</Tag>
+            {patient.fileType === "family" && (
+              <Tag color="purple">Family File</Tag>
             )}
           </Space>
 
-          {/* <Space size={16} style={{ marginTop: 4, marginLeft: 16 }} wrap>
-            <Text type="secondary">File #{patient.fileNumber}</Text>
-            <Text type="secondary">
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1">
+            <Text type="secondary" className="text-sm">
+              File #{patient.fileNumber}
+            </Text>
+            <Text type="secondary" className="text-sm">
               {patient.gender[0].toUpperCase() + patient.gender.slice(1)}
             </Text>
             {patient.dateOfBirth && (
-              <Text type="secondary">
-                {formatDob(patient.dateOfBirth)} &middot;{" "}
+              <Text type="secondary" className="text-sm">
+                {formatDob(patient.dateOfBirth)} ·{" "}
                 {calcAge(patient.dateOfBirth)} yrs
               </Text>
             )}
-            {patient.phone && <Text type="secondary">{patient.phone}</Text>}
-          </Space> */}
+            {patient.phone && (
+              <Text type="secondary" className="text-sm">
+                {patient.phone}
+              </Text>
+            )}
+          </div>
         </div>
 
         {/* Actions */}
         <Space>
-          <Button icon={<EditOutlined />} onClick={onEditClick} />
+          <Button icon={<EditOutlined />} onClick={onEditClick}>
+            Edit
+          </Button>
           <Dropdown
-            menu={{ items: statusMenuItems, onClick: handleStatusChange }}
+            menu={{
+              items: statusMenuItems,
+              onClick: ({ key }) => setStatus(patient.id, key as PatientStatus),
+            }}
             trigger={["click"]}
             disabled={saving}
           >
-            <Button icon={<MoreOutlined />} />
+            <Button icon={<MoreOutlined />} title="More actions" />
           </Dropdown>
         </Space>
       </div>

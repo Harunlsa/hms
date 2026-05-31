@@ -30,4 +30,6 @@ export interface PatientRepository {
     actor: PatientActor,
   ): Promise<Patient | null>;
   checkDuplicate(name: string, dateOfBirth: string): Promise<Patient | null>;
+  getNextFileNumber(): Promise<string>;
+  isFileNumberTaken(fileNumber: string): Promise<boolean>;
 }

@@ -8,6 +8,7 @@ export interface TopbarUser {
 
 export interface TopbarProps {
   title: string;
+  titleBadge?: number;
   user: TopbarUser;
   status?: AppStatus;
   showSearch?: boolean;

@@ -1,4 +1,3 @@
-// src/modules/patients/patient.mock.ts
 import { faker, fakerEN_NG } from "@faker-js/faker";
 import {
   Patient,
@@ -94,12 +93,12 @@ function pickLast() {
 }
 
 function buildName(gender: PatientGender) {
-  const first = pickFirst(gender);
-  const middle = faker.datatype.boolean({ probability: 0.35 })
-    ? pickFirst("male")
-    : null;
-  const last = pickLast();
-  return [first, middle, last].filter(Boolean).join(" ");
+  const parts = [
+    pickFirst(gender),
+    faker.datatype.boolean({ probability: 0.35 }) ? pickFirst("male") : null,
+    pickLast(),
+  ].filter(Boolean);
+  return parts.join(" ");
 }
 
 function isoDate(d: Date) {
@@ -109,9 +108,17 @@ function makeFileNumber(seq: number) {
   return String(seq + 100000).padStart(6, "0");
 }
 
+import {
+  Visit,
+  VisitStatus,
+  VisitType,
+  Prescription,
+} from "./types/visit.types";
+
+// ... existing code ...
+
 function makeEmergencyContacts(): EmergencyContact[] {
-  const count = faker.number.int({ min: 0, max: 2 });
-  return Array.from({ length: count }, () => ({
+  return Array.from({ length: faker.number.int({ min: 0, max: 2 }) }, () => ({
     id: crypto.randomUUID(),
     name: buildName("male"),
     phone: fakerEN_NG.phone.number({ style: "national" }),
@@ -119,7 +126,93 @@ function makeEmergencyContacts(): EmergencyContact[] {
   }));
 }
 
+const DOCTOR_NAMES = [
+  "Dr. Amina Abubakar",
+  "Dr. Samuel Okoro",
+  "Dr. Chioma Nnadi",
+  "Dr. Ahmed Musa",
+  "Dr. Sarah Williams",
+];
+
+const VISIT_REASONS = [
+  "Routine checkup",
+  "Severe headache and fever",
+  "Follow-up on previous treatment",
+  "Lower back pain",
+  "Abdominal discomfort",
+  "Chest pain and shortness of breath",
+  "Skin rash",
+];
+
+const MEDICINES = [
+  "Paracetamol",
+  "Amoxicillin",
+  "Ibuprofen",
+  "Omeprazole",
+  "Metformin",
+  "Loratadine",
+  "Ciprofloxacin",
+];
+
+function makeVisits(patientId: string): Visit[] {
+  return Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () => {
+    const status: VisitStatus = faker.helpers.arrayElement([
+      "completed",
+      "completed",
+      "ongoing",
+    ]);
+    const type: VisitType = faker.helpers.arrayElement([
+      "consultation",
+      "emergency",
+      "follow-up",
+      "routine-checkup",
+    ]);
+    const prescriptions: Prescription[] = Array.from(
+      { length: faker.number.int({ min: 0, max: 3 }) },
+      () => ({
+        id: crypto.randomUUID(),
+        medicine: faker.helpers.arrayElement(MEDICINES),
+        dosage: faker.helpers.arrayElement(["500mg", "250mg", "10mg", "5ml"]),
+        frequency: faker.helpers.arrayElement([
+          "Once daily",
+          "Twice daily",
+          "Three times daily",
+        ]),
+        duration: faker.helpers.arrayElement(["5 days", "7 days", "14 days"]),
+      }),
+    );
+
+    return {
+      id: crypto.randomUUID(),
+      patientId,
+      date: faker.date.past({ years: 1 }).toISOString(),
+      doctorName: faker.helpers.arrayElement(DOCTOR_NAMES),
+      doctorId: crypto.randomUUID(),
+      reason: faker.helpers.arrayElement(VISIT_REASONS),
+      summary: faker.lorem.sentence(),
+      status,
+      type,
+      notes: faker.lorem.paragraphs(2),
+      diagnosis: faker.lorem.sentence(),
+      observations: faker.lorem.sentences(3),
+      prescriptions,
+    };
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 const SYSTEM_ACTOR: PatientActor = { id: "system", name: "System" };
+
+// Seeded family file stubs — plain numeric numbers, no prefix
+const FAMILY_A = {
+  id: crypto.randomUUID(),
+  fileNumber: "100501",
+  headName: "Abdullahi Family",
+};
+const FAMILY_B = {
+  id: crypto.randomUUID(),
+  fileNumber: "100502",
+  headName: "Ibrahim Family",
+};
 
 function seedPatient(
   seq: number,
@@ -131,24 +224,21 @@ function seedPatient(
     ? "female"
     : "male";
   const name = buildName(gender);
-  const firstName = name.split(" ")[0];
-  const lastName = name.split(" ").at(-1) ?? "";
+  const nameParts = name.split(" ");
+  const firstName = nameParts[0];
+  const lastName = nameParts[nameParts.length - 1];
   const dob = faker.date.birthdate({ min: 1, max: 80, mode: "age" });
   const createdAt = faker.date.past({ years: 3 }).toISOString();
-  const statusOptions: PatientStatus[] = [
-    "active",
-    "active",
-    "active",
-    "inactive",
-    "archived",
-  ];
+  const id = crypto.randomUUID();
 
   return {
-    id: crypto.randomUUID(),
-    fileNumber: makeFileNumber(seq),
+    id,
+    fileNumber:
+      fileType === "family"
+        ? (familyFileNumber ?? makeFileNumber(seq))
+        : makeFileNumber(seq),
     fileType,
     familyFileId,
-    familyFileNumber,
     name,
     dateOfBirth: isoDate(dob),
     gender,
@@ -156,7 +246,13 @@ function seedPatient(
     email: fakerEN_NG.internet.email({ firstName, lastName }),
     address: fakerEN_NG.location.streetAddress(),
     emergencyContacts: makeEmergencyContacts(),
-    status: faker.helpers.arrayElement(statusOptions),
+    status: faker.helpers.arrayElement<PatientStatus>([
+      "active",
+      "active",
+      "active",
+      "inactive",
+      "archived",
+    ]),
     createdAt,
     auditLog: [
       {
@@ -167,12 +263,13 @@ function seedPatient(
         action: "created",
       },
     ],
+    visits: makeVisits(id),
   };
 }
 
-// Seeded family file stubs (IDs used by patients below)
-const FAMILY_A = { id: crypto.randomUUID(), fileNumber: "F-110001" };
-const FAMILY_B = { id: crypto.randomUUID(), fileNumber: "F-110002" };
+// // Seeded family file stubs (IDs used by patients below)
+// const FAMILY_A = { id: crypto.randomUUID(), fileNumber: "F-110001" };
+// const FAMILY_B = { id: crypto.randomUUID(), fileNumber: "F-110002" };
 
 const seededPatients: Patient[] = [
   ...Array.from({ length: 8 }, (_, i) => seedPatient(i + 1)),
@@ -185,7 +282,12 @@ const seededPatients: Patient[] = [
 ];
 
 const store = new Map<string, Patient>(seededPatients.map((p) => [p.id, p]));
-let fileSeq = store.size + 1;
+// Track all registered file numbers to enforce uniqueness
+const usedFileNumbers = new Set<string>(
+  seededPatients.map((p) => p.fileNumber),
+);
+let fileSeq = 12; // next individual will be makeFileNumber(13) = 100013
+// let fileSeq = store.size + 1;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function normalize(s: string) {
@@ -197,8 +299,7 @@ function matchesQuery(p: Patient, q: string) {
   return (
     normalize(p.name).includes(n) ||
     p.fileNumber.includes(n) ||
-    (p.familyFileNumber ?? "").toLowerCase().includes(n) ||
-    p.phone.replace(/\s/g, "").includes(n.replace(/\s/g, ""))
+    (p.phone ?? "").replace(/\s/g, "").includes(n.replace(/\s/g, ""))
   );
 }
 
@@ -222,29 +323,39 @@ export const patientMockRepo: PatientRepository = {
     return store.get(id) ?? null;
   },
 
+  async getNextFileNumber() {
+    let candidate = fileSeq + 1;
+    while (usedFileNumbers.has(makeFileNumber(candidate))) candidate++;
+    return makeFileNumber(candidate);
+  },
+
   async create(data, actor) {
-    fileSeq += 1;
+    // fileSeq += 1;
     const now = new Date().toISOString();
     let familyFileId = data.familyFileId;
-    let familyFileNumber: string | undefined;
+    let fileNumber = data.fileNumber;
 
     if (data.fileType === "family" && data.createFamilyFile) {
-      const newFile = await familyFileMockRepo.create(
-        `${data.name.split(" ").at(-1)} Family`,
-      );
+      // New family file — the provided fileNumber becomes the family file number
+      const nameParts = data.name.split(" ");
+      const lastName = nameParts[nameParts.length - 1] ?? "";
+      const label = data.familyFileName?.trim() || `${lastName} Family`;
+      const newFile = await familyFileMockRepo.create(label, fileNumber);
       familyFileId = newFile.id;
-      familyFileNumber = newFile.fileNumber;
+      fileNumber = newFile.fileNumber;
     } else if (familyFileId) {
       const existing = await familyFileMockRepo.getById(familyFileId);
-      familyFileNumber = existing?.fileNumber;
+      if (existing) fileNumber = existing.fileNumber;
     }
+
+    usedFileNumbers.add(fileNumber);
+    if (data.fileType === "individual") fileSeq++;
 
     const patient: Patient = {
       id: crypto.randomUUID(),
-      fileNumber: makeFileNumber(fileSeq),
+      fileNumber,
       fileType: data.fileType,
       familyFileId,
-      familyFileNumber,
       name: data.name,
       dateOfBirth: data.dateOfBirth,
       gender: data.gender,
@@ -266,6 +377,7 @@ export const patientMockRepo: PatientRepository = {
           action: "created",
         },
       ],
+      visits: [],
     };
 
     store.set(patient.id, patient);
@@ -347,5 +459,9 @@ export const patientMockRepo: PatientRepository = {
           p.status !== "archived",
       ) ?? null
     );
+  },
+
+  async isFileNumberTaken(fileNumber) {
+    return usedFileNumbers.has(fileNumber);
   },
 };

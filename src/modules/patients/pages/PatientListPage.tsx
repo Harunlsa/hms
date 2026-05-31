@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Input,
   Select,
@@ -34,12 +33,6 @@ function formatDob(iso: string) {
     month: "short",
     year: "numeric",
   });
-}
-
-function calcAge(iso: string) {
-  if (!iso) return null;
-  const diff = Date.now() - new Date(iso).getTime();
-  return Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
 }
 
 export default function PatientListPage() {
@@ -173,9 +166,9 @@ export default function PatientListPage() {
           render={(fn: string, r: Patient) => (
             <div>
               <span className="font-mono text-sm">{fn}</span>
-              {r.fileType === "family" && r.familyFileNumber && (
+              {r.fileType === "family" && (
                 <Tag color="purple" className="ml-1 text-xs">
-                  {r.familyFileNumber}
+                  Family
                 </Tag>
               )}
             </div>

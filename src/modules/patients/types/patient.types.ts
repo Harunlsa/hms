@@ -1,3 +1,5 @@
+import { Visit } from "./visit.types";
+
 export type PatientStatus = "active" | "inactive" | "archived";
 export type PatientGender = "male" | "female";
 export type FileType = "individual" | "family";
@@ -25,7 +27,7 @@ export interface Patient {
   familyFileId?: string;
   familyFileNumber?: string;
   name: string;
-  dateOfBirth?: string;
+  dateOfBirth: string;
   gender: PatientGender;
   phone?: string;
   email?: string;
@@ -35,21 +37,31 @@ export interface Patient {
   createdAt: string;
   updatedAt?: string;
   auditLog: AuditEntry[];
+  visits: Visit[];
 }
 
 export type RegisterPatientInput = {
   name: string;
   dateOfBirth: string;
   gender: PatientGender;
-  phone: string;
+  phone?: string;
   email?: string;
   address?: string;
   emergencyContacts?: Omit<EmergencyContact, "id">[];
   fileType: FileType;
-  familyFileId?: string; // existing family file to add to
-  createFamilyFile?: boolean; // create a brand new family file
+  fileNumber: string;
+  familyFileId?: string;
+  createFamilyFile?: boolean;
+  familyFileName?: string;
 };
 
 export type UpdatePatientInput = Partial<
-  Omit<RegisterPatientInput, "fileType" | "familyFileId" | "createFamilyFile">
+  Omit<
+    RegisterPatientInput,
+    | "fileType"
+    | "fileNumber"
+    | "familyFileId"
+    | "createFamilyFile"
+    | "familyFileName"
+  >
 >;
