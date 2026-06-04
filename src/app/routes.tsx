@@ -1,22 +1,15 @@
 // import PatientPage from "@/modules/patients/pages/PatientPage";
 import { RouteObject } from "react-router";
 import { MainLayout } from "@/layouts/MainLayout";
+import { ErrorPage } from "@/shared/components/ErrorPage";
 import PatientListPage from "@/modules/patients/pages/PatientListPage";
 import PatientPage from "@/modules/patients/pages/PatientPage";
-
-// export const routes = [
-//   {
-//     path: '/patients/:id',
-//     element: <PatienbtPage />,
-//     title: 'Patient Profile',
-//     roles: ['doctor', 'nurse'],
-//   },
-// ];
 
 export const routes: RouteObject[] = [
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,

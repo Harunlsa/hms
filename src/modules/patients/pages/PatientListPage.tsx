@@ -1,29 +1,13 @@
-import {
-  Button,
-  Input,
-  Select,
-  Space,
-  Table,
-  Tag,
-  Typography,
-  message,
-} from "antd";
+import { Button, Input, Table, Tag, Typography, message } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { TableProps } from "antd";
-import { Patient, PatientStatus } from "../types/patient.types";
+import { Patient } from "../types/patient.types";
 import { usePatientStore } from "../store/patient.store";
-// import { RegisterPatientDrawer } from "../components/RegisterPatientDrawer";
 import { RegisterPatientModal } from "../components/RegisterPatientModal";
 
 const { Column } = Table;
-
-const STATUS_COLOR: Record<PatientStatus, string> = {
-  active: "green",
-  inactive: "orange",
-  archived: "default",
-};
 
 function formatDob(iso: string) {
   if (!iso) return "—";
@@ -37,15 +21,8 @@ function formatDob(iso: string) {
 
 export default function PatientListPage() {
   const navigate = useNavigate();
-  const {
-    patients,
-    loading,
-    searchQuery,
-    statusFilter,
-    fetchAll,
-    setSearchQuery,
-    setStatusFilter,
-  } = usePatientStore();
+  const { patients, loading, searchQuery, fetchAll, setSearchQuery } =
+    usePatientStore();
 
   const [registerOpen, setRegisterOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -55,17 +32,13 @@ export default function PatientListPage() {
     fetchAll();
   }, []);
 
-  // Re-fetch whenever search/filter changes
+  // Re-fetch whenever search changes
   useEffect(() => {
     fetchAll();
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery]);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-  };
-
-  const handleStatusFilter = (value: PatientStatus | "all") => {
-    setStatusFilter(value);
   };
 
   const rowProps = (record: Patient) => ({
@@ -95,7 +68,6 @@ export default function PatientListPage() {
     <>
       {contextHolder}
 
-      {/* ── Header ── */}
       <div
         style={{
           display: "flex",
@@ -104,24 +76,7 @@ export default function PatientListPage() {
           marginBottom: 16,
         }}
       >
-        {/* <Typography.Title level={4} style={{ margin: 0 }}>
-          Patients
-          <Badge
-            count={patients.length}
-            showZero
-            color="blue"
-            style={{ marginLeft: 8 }}
-          />
-        </Typography.Title> */}
         <div></div>
-
-        {/* <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setRegisterOpen(true)}
-        >
-          Register Patient
-        </Button> */}
       </div>
 
       {/* ── Filters ── */}
@@ -132,23 +87,14 @@ export default function PatientListPage() {
           allowClear
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
-          style={{ maxWidth: 360 }}
-        />
-        <Select
-          value={statusFilter}
-          onChange={handleStatusFilter}
-          style={{ width: 140 }}
-          options={[
-            { value: "all", label: "All" },
-            { value: "active", label: "Active" },
-            { value: "inactive", label: "Inactive" },
-            { value: "archived", label: "Archived" },
-          ]}
+          className="w-full max-w-3xl shadow-sm h-10"
         />
         <div className="ml-auto">
           <Button
             type="primary"
             icon={<PlusOutlined />}
+            size="large"
+            className="h-10 px-6 font-medium shadow-sm bg-blue-600"
             onClick={() => setRegisterOpen(true)}
           >
             Register Patient
@@ -157,99 +103,88 @@ export default function PatientListPage() {
       </div>
 
       {/* ── Table ── */}
-      <Table<Patient> {...tableProps}>
-        <Column
-          title="File No."
-          dataIndex="fileNumber"
-          key="fileNumber"
-          width={100}
-          render={(fn: string, r: Patient) => (
-            <div>
-              <span className="font-mono text-sm">{fn}</span>
-              {r.fileType === "family" && (
-                <Tag color="purple" className="ml-1 text-xs">
-                  Family
-                </Tag>
-              )}
-            </div>
-          )}
-        />
-        <Column
-          title="Name"
-          dataIndex="name"
-          key="name"
-          render={(name: string) => (
-            <Typography.Text strong>{name}</Typography.Text>
-          )}
-        />
-        <Column
-          title="Gender"
-          dataIndex="gender"
-          key="gender"
-          width={90}
-          render={(g: string) => g[0].toUpperCase() + g.slice(1)}
-        />
-        <Column
-          title="Date of Birth"
-          dataIndex="dateOfBirth"
-          key="dateOfBirth"
-          width={130}
-          render={(dob: string) => (
-            <Space size={4}>
-              {formatDob(dob)}
-              {/* {calcAge(dob) !== null && (
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                  ({calcAge(dob)} yrs)
-                </Typography.Text>
-              )} */}
-            </Space>
-          )}
-        />
-        <Column title="Phone" dataIndex="phone" key="phone" width={150} />
-        <Column
-          title="Status"
-          dataIndex="status"
-          key="status"
-          width={100}
-          render={(status: PatientStatus) => (
-            <Tag color={STATUS_COLOR[status]}>
-              {status[0].toUpperCase() + status.slice(1)}
-            </Tag>
-          )}
-        />
-        <Column
-          title="Registered"
-          dataIndex="createdAt"
-          key="createdAt"
-          width={120}
-          render={(iso: string) =>
-            new Date(iso).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })
-          }
-        />
-      </Table>
-
-      {/* ── Register Drawer ── */}
-      {/* <RegisterPatientDrawer
-        open={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        onSuccess={(patient) => {
-          messageApi.success(
-            `Patient "${patient.name}" registered successfully (File #${patient.fileNumber})`,
-          );
-          navigate(`/patients/${patient.id}`);
-        }}
-      /> */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <Table<Patient> {...tableProps}>
+          <Column
+            title="File No."
+            dataIndex="fileNumber"
+            key="fileNumber"
+            width={120}
+            render={(fn: string, r: Patient) => (
+              <div>
+                <span className="font-mono text-sm font-semibold text-gray-700">
+                  {fn}
+                </span>
+                {r.fileType === "family" && (
+                  <Tag
+                    color="purple"
+                    className="ml-2 text-[10px] uppercase font-bold border-none px-2 rounded-full"
+                  >
+                    Family
+                  </Tag>
+                )}
+              </div>
+            )}
+          />
+          <Column
+            title="Name"
+            dataIndex="name"
+            key="name"
+            render={(name: string) => (
+              <Typography.Text className="font-semibold text-gray-800">
+                {name}
+              </Typography.Text>
+            )}
+          />
+          <Column
+            title="Gender"
+            dataIndex="gender"
+            key="gender"
+            width={100}
+            render={(g: string) => (
+              <span className="capitalize text-gray-500">{g}</span>
+            )}
+          />
+          <Column
+            title="Date of Birth"
+            dataIndex="dateOfBirth"
+            key="dateOfBirth"
+            width={150}
+            render={(dob: string) => (
+              <span className="text-gray-600">{formatDob(dob)}</span>
+            )}
+          />
+          <Column
+            title="Phone"
+            dataIndex="phone"
+            key="phone"
+            width={160}
+            className="font-mono text-gray-500"
+          />
+          <Column
+            title="Registered"
+            dataIndex="createdAt"
+            key="createdAt"
+            width={140}
+            render={(iso: string) => (
+              <span className="text-gray-400 text-xs">
+                {new Date(iso).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
+          />
+        </Table>
+      </div>
 
       <RegisterPatientModal
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
         onSuccess={(patient) => {
           messageApi.success(
-            `"${patient.name}" registered — File #${patient.fileNumber}`,
+            `"${patient.name}" registered — File Number: ${patient.fileNumber}`,
           );
           navigate(`/patients/${patient.id}`);
         }}

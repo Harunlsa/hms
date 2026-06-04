@@ -9,6 +9,10 @@ import { FamilyFile } from "../types/family-file.types";
 import { patientMockRepo } from "../patient.mock";
 import { familyFileMockRepo } from "../family-file.mock";
 import { PatientSearchParams } from "../patient.repository";
+import { Visit } from "../types/visit.types";
+import { Appointment } from "../types/appointment.types";
+import { Prescription } from "../types/prescription.types";
+import { Invoice, Payment } from "../types/billing.types";
 
 const CURRENT_ACTOR = { id: "usr-001", name: "Dr Hugh Mann" };
 
@@ -36,6 +40,39 @@ interface PatientState {
   ) => Promise<{ patient: Patient; duplicate: Patient | null }>;
   update: (id: string, data: UpdatePatientInput) => Promise<void>;
   setStatus: (id: string, status: PatientStatus) => Promise<void>;
+  addVisit: (
+    patientId: string,
+    visit: Omit<Visit, "id" | "patientId">,
+  ) => Promise<void>;
+  addAppointment: (
+    patientId: string,
+    appointment: Omit<Appointment, "id" | "patientId">,
+  ) => Promise<void>;
+  updateAppointment: (
+    patientId: string,
+    appointmentId: string,
+    data: Partial<Omit<Appointment, "id" | "patientId">>,
+  ) => Promise<void>;
+  cancelAppointment: (
+    patientId: string,
+    appointmentId: string,
+  ) => Promise<void>;
+  addPrescription: (
+    patientId: string,
+    prescription: Omit<Prescription, "id">,
+  ) => Promise<void>;
+  cancelPrescription: (
+    patientId: string,
+    prescriptionId: string,
+  ) => Promise<void>;
+  addInvoice: (
+    patientId: string,
+    invoice: Omit<Invoice, "id" | "patientId">,
+  ) => Promise<void>;
+  addPayment: (
+    patientId: string,
+    payment: Omit<Payment, "id" | "patientId">,
+  ) => Promise<void>;
   setSearchQuery: (query: string) => void;
   setStatusFilter: (status: PatientStatus | "all") => void;
   clearSelected: () => void;
@@ -134,6 +171,207 @@ export const usePatientStore = create<PatientState>((set, get) => ({
           selectedPatient:
             state.selectedPatient?.id === id ? updated : state.selectedPatient,
           patients: state.patients.map((p) => (p.id === id ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  addVisit: async (patientId, visit) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.addVisit(
+        patientId,
+        visit,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  addAppointment: async (patientId, appointment) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.addAppointment(
+        patientId,
+        appointment,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  updateAppointment: async (patientId, appointmentId, data) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.updateAppointment(
+        patientId,
+        appointmentId,
+        data,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  cancelAppointment: async (patientId, appointmentId) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.cancelAppointment(
+        patientId,
+        appointmentId,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  addPrescription: async (patientId, prescription) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.addPrescription(
+        patientId,
+        prescription,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  cancelPrescription: async (patientId, prescriptionId) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.cancelPrescription(
+        patientId,
+        prescriptionId,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  addInvoice: async (patientId, invoice) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.addInvoice(
+        patientId,
+        invoice,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
+        }));
+      }
+    } catch (e) {
+      set({ error: String(e) });
+      throw e;
+    } finally {
+      set({ saving: false });
+    }
+  },
+
+  addPayment: async (patientId, payment) => {
+    set({ saving: true, error: null });
+    try {
+      const updated = await patientMockRepo.addPayment(
+        patientId,
+        payment,
+        CURRENT_ACTOR,
+      );
+      if (updated) {
+        set((state) => ({
+          selectedPatient:
+            state.selectedPatient?.id === patientId
+              ? updated
+              : state.selectedPatient,
+          patients: state.patients.map((p) => (p.id === patientId ? updated : p)),
         }));
       }
     } catch (e) {

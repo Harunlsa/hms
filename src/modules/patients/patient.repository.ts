@@ -4,6 +4,10 @@ import {
   RegisterPatientInput,
   UpdatePatientInput,
 } from "./types/patient.types";
+import { Visit } from "./types/visit.types";
+import { Appointment } from "./types/appointment.types";
+import { Prescription } from "./types/prescription.types";
+import { Invoice, Payment } from "./types/billing.types";
 
 export interface PatientSearchParams {
   query?: string;
@@ -27,6 +31,47 @@ export interface PatientRepository {
   setStatus(
     id: string,
     status: PatientStatus,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  addVisit(
+    patientId: string,
+    visit: Omit<Visit, "id" | "patientId">,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  addPrescription(
+    patientId: string,
+    prescription: Omit<Prescription, "id">,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  cancelPrescription(
+    patientId: string,
+    prescriptionId: string,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  addAppointment(
+    patientId: string,
+    appointment: Omit<Appointment, "id" | "patientId">,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  updateAppointment(
+    patientId: string,
+    appointmentId: string,
+    data: Partial<Omit<Appointment, "id" | "patientId">>,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  cancelAppointment(
+    patientId: string,
+    appointmentId: string,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  addInvoice(
+    patientId: string,
+    invoice: Omit<Invoice, "id" | "patientId">,
+    actor: PatientActor,
+  ): Promise<Patient | null>;
+  addPayment(
+    patientId: string,
+    payment: Omit<Payment, "id" | "patientId">,
     actor: PatientActor,
   ): Promise<Patient | null>;
   checkDuplicate(name: string, dateOfBirth: string): Promise<Patient | null>;

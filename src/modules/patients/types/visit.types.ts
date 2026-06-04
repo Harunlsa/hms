@@ -1,13 +1,7 @@
+import { Prescription } from "./prescription.types";
+
 export type VisitStatus = "completed" | "ongoing" | "cancelled";
 export type VisitType = "consultation" | "emergency" | "follow-up" | "routine-checkup";
-
-export interface Prescription {
-  id: string;
-  medicine: string;
-  dosage: string;
-  frequency: string;
-  duration: string;
-}
 
 export interface Visit {
   id: string;

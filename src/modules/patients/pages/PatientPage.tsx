@@ -7,9 +7,10 @@ import { PatientTabs } from "../components/PatientTabs";
 
 export default function PatientPage() {
   const { id } = useParams<{ id: string }>();
-  const { selectedPatient, loading, fetchById, clearSelected } =
+  const { selectedPatient, loading, fetchById, clearSelected, saving } =
     usePatientStore();
-  const [editingOverview, setEditingOverview] = useState(false);
+  const [editMode, setEditMode] = useState<"none" | "info" | "all">("none");
+  const [allEditSaveTrigger, setAllEditSaveTrigger] = useState(0);
 
   useEffect(() => {
     if (id) fetchById(id);
@@ -34,13 +35,18 @@ export default function PatientPage() {
     <div>
       <PatientHeader
         patient={selectedPatient}
-        onEditClick={() => setEditingOverview(true)}
+        editMode={editMode}
+        onEditClick={() => setEditMode("all")}
+        onCancelClick={() => setEditMode("none")}
+        onSaveClick={() => setAllEditSaveTrigger((prev) => prev + 1)}
+        saving={saving}
       />
       <PatientTabs
         patient={selectedPatient}
-        editingOverview={editingOverview}
-        onEditOpen={() => setEditingOverview(true)}
-        onEditClose={() => setEditingOverview(false)}
+        editMode={editMode}
+        allEditSaveTrigger={allEditSaveTrigger}
+        onEditOpen={() => setEditMode("info")}
+        onEditClose={() => setEditMode("none")}
       />
     </div>
   );
