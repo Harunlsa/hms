@@ -57,6 +57,9 @@ export function MainLayout() {
     name: "Dr Hugh Mann",
     role: "doctor",
   };
+  const location = useLocation();
+  const isPosPage = location.pathname === "/pos";
+
   return (
     <Layout className="h-screen">
       <AppSidebar />
@@ -67,7 +70,7 @@ export function MainLayout() {
           user={user}
           showSearch={false}
         />
-        <Content className="p-lg overflow-y-scroll">
+        <Content className={`${isPosPage ? 'p-0' : 'p-lg'} overflow-y-scroll`}>
           <Outlet />
         </Content>
       </Layout>

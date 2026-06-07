@@ -4,6 +4,7 @@ import {
   TeamOutlined,
   UserOutlined,
   HomeOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 // import type { MenuProps } from "antd";
@@ -28,6 +29,12 @@ export const sidebarItems: SidebarItem[] = [
     label: "Patients",
     icon: UserOutlined,
     path: "/patients",
+  },
+  {
+    key: "pos",
+    label: "Point of Sale",
+    icon: ShoppingCartOutlined,
+    path: "/pos",
   },
   {
     key: "staff",
