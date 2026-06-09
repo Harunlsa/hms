@@ -33,6 +33,7 @@ const INITIAL_ITEMS: POSItem[] = [
   { 
     id: "itm-004", 
     code: "MED-PA-500", 
+    upc: "6151100001234",
     name: "Paracetamol 500mg", 
     type: "medication", 
     sellingPrice: 50, 
@@ -65,6 +66,7 @@ const INITIAL_ITEMS: POSItem[] = [
   { 
     id: "itm-005", 
     code: "MED-AM-250", 
+    upc: "6151100005678",
     name: "Amoxicillin 250mg", 
     type: "medication", 
     sellingPrice: 200, 
@@ -156,7 +158,7 @@ export const posMockRepo: POSRepository = {
   },
 
   async getInventoryStats() {
-    const items = Array.from(itemStore.values()).filter(i => i.type === 'medication');
+    const items = Array.from(itemStore.values()).filter(i => i.stockQuantity !== undefined);
     const today = new Date();
     const threeMonthsFromNow = new Date();
     threeMonthsFromNow.setMonth(today.getMonth() + 3);
@@ -172,6 +174,25 @@ export const posMockRepo: POSRepository = {
         })
       ).length
     };
+  },
+
+  async getAllInventoryMovements() {
+    return [...movements].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  },
+
+  async createItem(data) {
+    const id = `itm-${faker.number.int({ min: 1000, max: 9999 })}`;
+    const newItem: POSItem = { ...data, id };
+    itemStore.set(id, newItem);
+    return newItem;
+  },
+
+  async updateItem(id, data) {
+    const existing = itemStore.get(id);
+    if (!existing) throw new Error("Item not found");
+    const updated = { ...existing, ...data };
+    itemStore.set(id, updated);
+    return updated;
   },
 
   async createSale(data, actor) {

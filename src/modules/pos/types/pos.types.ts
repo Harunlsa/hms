@@ -18,6 +18,7 @@ export interface POSBatch {
 export interface POSItem {
   id: string;
   code: string; // SKU / Internal Code
+  upc?: string; // Universal Product Code / Barcode
   name: string;
   category: string;
   sellingPrice: number;

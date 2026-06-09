@@ -11,6 +11,7 @@ import {
   Row,
   Col,
   Statistic,
+  Drawer,
 } from "antd";
 import { 
   SearchOutlined, 
@@ -20,6 +21,7 @@ import {
   StopOutlined,
   HistoryOutlined,
   InfoCircleOutlined,
+  DatabaseOutlined,
 } from "@ant-design/icons";
 import { usePOSStore } from "../store/pos.store";
 import { POSItem } from "../types/pos.types";
@@ -36,31 +38,42 @@ export function InventoryTab() {
     fetchInventoryStats, 
     loadingInventory,
     itemMovements = {}, 
-    fetchItemMovements
+    fetchItemMovements,
+    allMovements,
+    fetchAllMovements,
   } = usePOSStore();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<POSItem | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerTab, setDrawerTab] = useState("general");
   const [loadingDetail, setLoadingDetail] = useState(false);
+  
+  const [globalMovementsVisible, setGlobalMovementsVisible] = useState(false);
 
   useEffect(() => {
     fetchItems();
     fetchInventoryStats();
   }, []);
 
-  const handleShowDetail = async (item: POSItem) => {
+  const handleShowDetail = async (item: POSItem, tab: string = "general") => {
     setSelectedItem(item);
+    setDrawerTab(tab);
     setDrawerVisible(true);
     setLoadingDetail(true);
     await fetchItemMovements(item.id);
     setLoadingDetail(false);
   };
 
-  const medicationItems = useMemo(() => {
+  const handleShowGlobalMovements = async () => {
+    setGlobalMovementsVisible(true);
+    await fetchAllMovements();
+  };
+
+  const stockableItems = useMemo(() => {
     const list = Array.isArray(items) ? items : [];
     return list.filter(item => 
-        item.type === 'medication' && 
+        item.stockQuantity !== undefined && 
         ((item.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
          (item.code || "").toLowerCase().includes(searchQuery.toLowerCase()))
     );
@@ -68,13 +81,18 @@ export function InventoryTab() {
 
   const columns = [
     {
-      title: "Medication",
+      title: "Product / Item",
       dataIndex: "name",
       key: "name",
       render: (name: string, record: POSItem) => (
         <Space direction="vertical" size={0}>
           <Text strong className="text-blue-700">{name}</Text>
-          <Text type="secondary" className="text-[10px] font-mono">{record.code}</Text>
+          <div className="flex gap-2 items-center">
+             <Text type="secondary" className="text-[10px] font-mono">{record.code}</Text>
+             <Tag className="!m-0 text-[8px] font-black uppercase border-0 rounded-full bg-gray-100 text-gray-500">
+                {record.type.replace("_", " ")}
+             </Tag>
+          </div>
         </Space>
       ),
     },
@@ -82,7 +100,7 @@ export function InventoryTab() {
       title: "Manufacturer",
       dataIndex: "manufacturer",
       key: "manufacturer",
-      render: (m?: string) => <Text className="text-xs">{m || "Unknown"}</Text>,
+      render: (m?: string) => <Text className="text-xs">{m || "-"}</Text>,
     },
     {
       title: "Current Stock",
@@ -127,8 +145,21 @@ export function InventoryTab() {
       align: "right" as const,
       render: (_: any, record: POSItem) => (
         <Space>
-           <Button size="small" icon={<HistoryOutlined />} title="Stock Movements" onClick={() => handleShowDetail(record)} />
-           <Button size="small" type="primary" ghost icon={<InfoCircleOutlined />} onClick={() => handleShowDetail(record)}>Detail</Button>
+           <Button 
+             size="small" 
+             icon={<HistoryOutlined />} 
+             title="Stock Movements" 
+             onClick={() => handleShowDetail(record, "movements")} 
+           />
+           <Button 
+             size="small" 
+             type="primary" 
+             ghost 
+             icon={<InfoCircleOutlined />} 
+             onClick={() => handleShowDetail(record, "general")}
+           >
+             Detail
+           </Button>
         </Space>
       ),
     },
@@ -139,20 +170,26 @@ export function InventoryTab() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <Title level={4} className="!m-0 font-black uppercase tracking-tight">Inventory Dashboard</Title>
-          <Text type="secondary" className="text-xs">Real-time medication stock tracking</Text>
+          <Text type="secondary" className="text-xs">Real-time stock tracking across all physical products</Text>
         </div>
-        <Button icon={<HistoryOutlined />} className="rounded-xl font-bold">Global Movements</Button>
+        <Button 
+          icon={<HistoryOutlined />} 
+          className="rounded-xl font-bold border-blue-200 text-blue-600 hover:bg-blue-50"
+          onClick={handleShowGlobalMovements}
+        >
+          Global Movements
+        </Button>
       </div>
 
       {/* Stats Dashboard */}
       <Row gutter={16} className="mb-8">
         <Col span={6}>
           <Card className="rounded-2xl border-0 shadow-sm bg-blue-600 text-white overflow-hidden relative" styles={{ body: { padding: '20px' } }}>
-            <MedicineBoxOutlined className="absolute -bottom-2 -right-2 text-6xl opacity-10" />
+            <DatabaseOutlined className="absolute -bottom-2 -right-2 text-6xl opacity-10" />
             <Statistic 
-              title={<Text className="text-white/80 font-bold uppercase text-[10px] tracking-wider">Total Products</Text>}
+              title={<Text className="text-white opacity-80 font-bold uppercase text-[10px] tracking-wider">Total Products</Text>}
               value={inventoryStats?.totalProducts || 0}
-              valueStyle={{ color: '#fff', fontWeight: 900 }}
+              valueStyle={{ color: '#ffffff', fontWeight: 900 }}
               loading={loadingInventory}
             />
           </Card>
@@ -192,13 +229,13 @@ export function InventoryTab() {
         </Col>
       </Row>
 
-      {/* Medication List */}
+      {/* Product List */}
       <Card className="rounded-2xl border-gray-100 shadow-sm overflow-hidden mb-4" styles={{ body: { padding: '12px' } }}>
         <div className="flex gap-4">
           <Input 
             prefix={<SearchOutlined className="text-gray-400" />} 
-            placeholder="Search medications..." 
-            className="h-10 rounded-xl border-gray-100"
+            placeholder="Search inventory items..." 
+            className="h-10 rounded-xl border-gray-200"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             allowClear
@@ -209,7 +246,7 @@ export function InventoryTab() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <Table 
           columns={columns} 
-          dataSource={medicationItems} 
+          dataSource={stockableItems} 
           loading={loadingItems}
           rowKey="id"
           pagination={{ pageSize: 10 }}
@@ -223,7 +260,28 @@ export function InventoryTab() {
         visible={drawerVisible}
         onClose={() => setDrawerVisible(false)}
         loading={loadingDetail}
+        initialTab={drawerTab}
       />
+
+      <Drawer
+        title="Global Stock Movements"
+        placement="right"
+        width={600}
+        onClose={() => setGlobalMovementsVisible(false)}
+        open={globalMovementsVisible}
+      >
+        <Table 
+           dataSource={allMovements}
+           rowKey="id"
+           size="small"
+           columns={[
+              { title: 'Date', dataIndex: 'timestamp', render: (ts) => new Date(ts).toLocaleString() },
+              { title: 'Type', dataIndex: 'type', render: (t) => <Tag color={t === 'in' ? 'success' : 'processing'}>{t.toUpperCase()}</Tag> },
+              { title: 'Qty', dataIndex: 'quantity', render: (q, r) => <Text strong>{r.type === 'in' ? '+' : '-'}{q}</Text> },
+              { title: 'Reason', dataIndex: 'reason' }
+           ]}
+        />
+      </Drawer>
 
       <style>{`
         .clinical-table .ant-table-thead > tr > th {

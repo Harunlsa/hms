@@ -20,6 +20,7 @@ interface POSState {
   inventoryStats: InventoryStats | null;
   loadingInventory: boolean;
   itemMovements: Record<string, InventoryMovement[]>;
+  allMovements: InventoryMovement[];
   
   // Active Sale (Basket)
   basket: SaleLineItem[];
@@ -37,6 +38,9 @@ interface POSState {
   fetchItems: (params?: POSSearchParams) => Promise<void>;
   fetchInventoryStats: () => Promise<void>;
   fetchItemMovements: (itemId: string) => Promise<void>;
+  fetchAllMovements: () => Promise<void>;
+  createItem: (item: Omit<POSItem, "id">) => Promise<POSItem>;
+  updateItem: (id: string, item: Partial<POSItem>) => Promise<POSItem>;
   
   // Actions - Basket
   addToBasket: (item: POSItem) => void;
@@ -62,6 +66,7 @@ export const usePOSStore = create<POSState>((set, get) => ({
   inventoryStats: null,
   loadingInventory: false,
   itemMovements: {},
+  allMovements: [],
   
   basket: [],
   payments: [],
@@ -101,6 +106,29 @@ export const usePOSStore = create<POSState>((set, get) => ({
     }
   },
 
+  fetchAllMovements: async () => {
+    try {
+      const results = await posMockRepo.getAllInventoryMovements();
+      set({ allMovements: results });
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  createItem: async (data) => {
+    const newItem = await posMockRepo.createItem(data);
+    await get().fetchItems();
+    await get().fetchInventoryStats();
+    return newItem;
+  },
+
+  updateItem: async (id, data) => {
+    const updated = await posMockRepo.updateItem(id, data);
+    await get().fetchItems();
+    await get().fetchInventoryStats();
+    return updated;
+  },
+
   addToBasket: (item) => {
     const { basket } = get();
     const existing = basket.find(i => i.itemId === item.id);
@@ -113,7 +141,7 @@ export const usePOSStore = create<POSState>((set, get) => ({
         itemId: item.id,
         name: item.name,
         quantity: 1,
-        unitPrice: item.sellingPrice, // Map sellingPrice to unitPrice in basket
+        unitPrice: item.sellingPrice,
         discount: 0,
         total: item.sellingPrice,
       };
@@ -187,7 +215,7 @@ export const usePOSStore = create<POSState>((set, get) => ({
 
     get().clearBasket();
     await get().fetchSales();
-    await get().fetchInventoryStats(); // Refresh inventory stats after sale
+    await get().fetchInventoryStats();
     return sale;
   },
 

@@ -20,7 +20,8 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import { usePOSStore } from "../store/pos.store";
-import { POSItem, POSItemType } from "../types/pos.types";
+import { POSItem } from "../types/pos.types";
+import { ItemFormDrawer } from "./ItemFormDrawer";
 
 const { Text, Title } = Typography;
 
@@ -44,10 +45,23 @@ export function ProductCatalogueTab() {
   const { items = [], fetchItems, loadingItems } = usePOSStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeType, setActiveType] = useState<string>("all");
+  
+  const [formVisible, setFormVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<POSItem | null>(null);
 
   useEffect(() => {
     fetchItems();
   }, []);
+
+  const handleEdit = (item: POSItem) => {
+    setSelectedItem(item);
+    setFormVisible(true);
+  };
+
+  const handleAddNew = () => {
+    setSelectedItem(null);
+    setFormVisible(true);
+  };
 
   const filteredItems = useMemo(() => {
     const list = Array.isArray(items) ? items : [];
@@ -63,10 +77,14 @@ export function ProductCatalogueTab() {
 
   const columns = [
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-      render: (code: string) => <Text className="font-mono font-bold text-blue-600">{code || "N/A"}</Text>,
+      title: "Identification",
+      key: "id",
+      render: (_: any, record: POSItem) => (
+        <Space direction="vertical" size={0}>
+          <Text className="font-mono font-bold text-blue-600">{record.code || "N/A"}</Text>
+          {record.upc && <Text type="secondary" className="text-[10px] font-mono">UPC: {record.upc}</Text>}
+        </Space>
+      ),
     },
     {
       title: "Name",
@@ -115,8 +133,8 @@ export function ProductCatalogueTab() {
       title: "Action",
       key: "action",
       align: "right" as const,
-      render: () => (
-        <Button size="small" type="link">Edit</Button>
+      render: (_: any, record: POSItem) => (
+        <Button size="small" type="link" onClick={() => handleEdit(record)}>Edit</Button>
       ),
     },
   ];
@@ -128,7 +146,12 @@ export function ProductCatalogueTab() {
           <Title level={4} className="!m-0 font-black uppercase tracking-tight">Catalogue</Title>
           <Text type="secondary" className="text-xs">Manage all billable items and services</Text>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} className="bg-blue-600 rounded-xl h-10 font-bold">
+        <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            className="bg-blue-600 rounded-xl h-10 font-bold"
+            onClick={handleAddNew}
+        >
           Add New Item
         </Button>
       </div>
@@ -170,6 +193,12 @@ export function ProductCatalogueTab() {
           className="clinical-table"
         />
       </div>
+
+      <ItemFormDrawer 
+        visible={formVisible}
+        onClose={() => setFormVisible(false)}
+        item={selectedItem}
+      />
 
       <style>{`
         .clinical-table .ant-table-thead > tr > th {

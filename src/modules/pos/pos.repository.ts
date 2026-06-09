@@ -18,6 +18,11 @@ export interface POSRepository {
   updateStock(itemId: string, adjustment: number, reason: string, actor: POSActor): Promise<void>;
   getInventoryMovements(itemId: string): Promise<InventoryMovement[]>;
   getInventoryStats(): Promise<InventoryStats>;
+  getAllInventoryMovements(): Promise<InventoryMovement[]>;
+  
+  // Catalogue Management
+  createItem(item: Omit<POSItem, "id">): Promise<POSItem>;
+  updateItem(id: string, item: Partial<POSItem>): Promise<POSItem>;
   
   // Sales
   createSale(sale: Omit<Sale, "id" | "timestamp">, actor: POSActor): Promise<Sale>;

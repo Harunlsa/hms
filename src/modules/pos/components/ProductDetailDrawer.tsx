@@ -4,8 +4,6 @@ import {
   HistoryOutlined, 
   DatabaseOutlined,
   InfoCircleOutlined,
-  ClockCircleOutlined,
-  DollarOutlined,
 } from "@ant-design/icons";
 import { POSItem, POSBatch, InventoryMovement } from "../types/pos.types";
 
@@ -17,9 +15,10 @@ interface ProductDetailDrawerProps {
   visible: boolean;
   onClose: () => void;
   loading?: boolean;
+  initialTab?: string;
 }
 
-export function ProductDetailDrawer({ item, movements, visible, onClose, loading }: ProductDetailDrawerProps) {
+export function ProductDetailDrawer({ item, movements, visible, onClose, loading, initialTab = "general" }: ProductDetailDrawerProps) {
   if (!item) return null;
 
   const batchColumns = [
@@ -105,8 +104,9 @@ export function ProductDetailDrawer({ item, movements, visible, onClose, loading
       onClose={onClose}
       open={visible}
       className="clinical-drawer"
+      destroyOnClose
     >
-      <Tabs defaultActiveKey="general" className="h-full">
+      <Tabs defaultActiveKey={initialTab} className="h-full">
         <Tabs.TabPane 
           tab={<span><InfoCircleOutlined /> General</span>} 
           key="general"
