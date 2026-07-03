@@ -277,7 +277,7 @@ export function NewSaleTab() {
             <Select
               showSearch
               placeholder="Search existing patients or select walk-in..."
-              className="w-full"
+              className="w-full rounded-xl overflow-hidden"
               variant="filled"
               allowClear
               value={selectedPatientId}
@@ -288,7 +288,6 @@ export function NewSaleTab() {
               }
               options={(Array.isArray(patients) ? patients : []).map(p => ({ value: p.id, label: p.name }))}
               style={{ height: '44px' }}
-              className="rounded-xl overflow-hidden"
             />
           </div>
 
