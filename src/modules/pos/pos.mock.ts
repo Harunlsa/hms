@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { POSItem, Sale, InventoryMovement, InventoryStats, POSBatch } from "./types/pos.types";
+import { POSItem, Sale, InventoryMovement } from "./types/pos.types";
 import { POSRepository, POSSearchParams, POSActor } from "./pos.repository";
 
 const INITIAL_ITEMS: POSItem[] = [
@@ -117,7 +117,79 @@ const INITIAL_ITEMS: POSItem[] = [
 ];
 
 const itemStore = new Map<string, POSItem>(INITIAL_ITEMS.map(i => [i.id, i]));
-const saleStore = new Map<string, Sale>();
+const INITIAL_SALES: Sale[] = [
+  {
+    id: "SALE-1001",
+    patientId: "pat-001",
+    patientName: "Hassan Bello",
+    items: [
+      { id: "li-001", itemId: "itm-004", name: "Paracetamol 500mg", quantity: 2, unitPrice: 50, discount: 0, total: 100 },
+      { id: "li-002", itemId: "itm-001", name: "General Consultation", quantity: 1, unitPrice: 5000, discount: 0, total: 5000 }
+    ],
+    subtotal: 5100,
+    totalDiscount: 100,
+    tax: 0,
+    total: 5000,
+    payments: [{ method: "cash", amount: 5000 }],
+    status: "completed",
+    timestamp: "2026-07-27T10:15:30.000Z",
+    processedBy: { id: "usr-001", name: "Dr Hugh Mann" }
+  },
+  {
+    id: "SALE-1002",
+    patientName: "Walk-in Patient",
+    items: [
+      { id: "li-003", itemId: "itm-005", name: "Amoxicillin 250mg", quantity: 1, unitPrice: 200, discount: 0, total: 200 },
+      { id: "li-004", itemId: "itm-007", name: "Malaria Parasite Test", quantity: 1, unitPrice: 3000, discount: 0, total: 3000 }
+    ],
+    subtotal: 3200,
+    totalDiscount: 0,
+    tax: 0,
+    total: 3200,
+    payments: [{ method: "card", amount: 3200 }],
+    status: "completed",
+    timestamp: "2026-07-27T12:30:00.000Z",
+    processedBy: { id: "usr-001", name: "Dr Hugh Mann" }
+  },
+  {
+    id: "SALE-1003",
+    patientId: "pat-002",
+    patientName: "Fatima Yusuf",
+    items: [
+      { id: "li-005", itemId: "itm-002", name: "Specialist Consultation", quantity: 1, unitPrice: 15000, discount: 0, total: 15000 },
+      { id: "li-006", itemId: "itm-006", name: "Full Blood Count", quantity: 1, unitPrice: 4500, discount: 0, total: 4500 }
+    ],
+    subtotal: 19500,
+    totalDiscount: 500,
+    tax: 0,
+    total: 19000,
+    payments: [{ method: "transfer", amount: 19000 }],
+    status: "completed",
+    timestamp: "2026-07-26T14:45:00.000Z",
+    processedBy: { id: "usr-002", name: "Nurse Joy" }
+  },
+  {
+    id: "SALE-1004",
+    patientId: "pat-003",
+    patientName: "Emeka Obi",
+    items: [
+      { id: "li-007", itemId: "itm-008", name: "Private Ward Deposit", quantity: 1, unitPrice: 50000, discount: 0, total: 50000 }
+    ],
+    subtotal: 50000,
+    totalDiscount: 0,
+    tax: 0,
+    total: 50000,
+    payments: [
+      { method: "card", amount: 30000 },
+      { method: "cash", amount: 20000 }
+    ],
+    status: "completed",
+    timestamp: "2026-07-25T09:00:00.000Z",
+    processedBy: { id: "usr-001", name: "Dr Hugh Mann" }
+  }
+];
+
+const saleStore = new Map<string, Sale>(INITIAL_SALES.map(s => [s.id, s]));
 const movements: InventoryMovement[] = [];
 
 export const posMockRepo: POSRepository = {

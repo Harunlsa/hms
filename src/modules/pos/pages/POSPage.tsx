@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Tabs, Typography } from "antd";
+import { Tabs } from "antd";
 import {
   ShoppingCartOutlined,
   HistoryOutlined,
@@ -10,8 +10,8 @@ import {
 import { NewSaleTab } from "../components/NewSaleTab";
 import { ProductCatalogueTab } from "../components/ProductCatalogueTab";
 import { InventoryTab } from "../components/InventoryTab";
-
-const { Title } = Typography;
+import { TransactionsTab } from "../components/TransactionsTab";
+import { ReportsTab } from "../components/ReportsTab";
 
 export default function POSPage() {
   const [activeTab, setActiveTab] = useState("new-sale");
@@ -35,7 +35,7 @@ export default function POSPage() {
           Transactions
         </span>
       ),
-      children: <div className="p-8">Transactions Content (Coming Soon)</div>,
+      children: <TransactionsTab />,
     },
     {
       key: "inventory",
@@ -65,7 +65,7 @@ export default function POSPage() {
           Reports
         </span>
       ),
-      children: <div className="p-8">Reports Content (Coming Soon)</div>,
+      children: <ReportsTab />,
     },
   ];
 

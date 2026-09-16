@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import { POSItem, POSBatch, InventoryMovement } from "../types/pos.types";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 interface ProductDetailDrawerProps {
   item: POSItem | null;

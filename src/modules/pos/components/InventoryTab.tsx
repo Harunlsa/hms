@@ -15,17 +15,18 @@ import {
 } from "antd";
 import { 
   SearchOutlined, 
-  MedicineBoxOutlined,
   AlertOutlined,
   ClockCircleOutlined,
   StopOutlined,
   HistoryOutlined,
   InfoCircleOutlined,
   DatabaseOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { usePOSStore } from "../store/pos.store";
 import { POSItem } from "../types/pos.types";
 import { ProductDetailDrawer } from "./ProductDetailDrawer";
+import { ItemFormDrawer } from "./ItemFormDrawer";
 
 const { Text, Title } = Typography;
 
@@ -50,6 +51,8 @@ export function InventoryTab() {
   const [loadingDetail, setLoadingDetail] = useState(false);
   
   const [globalMovementsVisible, setGlobalMovementsVisible] = useState(false);
+  const [itemFormVisible, setItemFormVisible] = useState(false);
+  const [formSelectedItem, setFormSelectedItem] = useState<POSItem | null>(null);
 
   useEffect(() => {
     fetchItems();
@@ -172,13 +175,26 @@ export function InventoryTab() {
           <Title level={4} className="!m-0 font-black uppercase tracking-tight">Inventory Dashboard</Title>
           <Text type="secondary" className="text-xs">Real-time stock tracking across all physical products</Text>
         </div>
-        <Button 
-          icon={<HistoryOutlined />} 
-          className="rounded-xl font-bold border-blue-200 text-blue-600 hover:bg-blue-50"
-          onClick={handleShowGlobalMovements}
-        >
-          Global Movements
-        </Button>
+        <Space>
+          <Button 
+            icon={<HistoryOutlined />} 
+            className="rounded-xl font-bold border-blue-200 text-blue-600 hover:bg-blue-50"
+            onClick={handleShowGlobalMovements}
+          >
+            Global Movements
+          </Button>
+          <Button 
+            type="primary"
+            icon={<PlusOutlined />}
+            className="rounded-xl font-bold bg-blue-600"
+            onClick={() => {
+              setFormSelectedItem(null);
+              setItemFormVisible(true);
+            }}
+          >
+            Add New Item
+          </Button>
+        </Space>
       </div>
 
       {/* Stats Dashboard */}
@@ -261,6 +277,12 @@ export function InventoryTab() {
         onClose={() => setDrawerVisible(false)}
         loading={loadingDetail}
         initialTab={drawerTab}
+      />
+      
+      <ItemFormDrawer 
+        visible={itemFormVisible}
+        onClose={() => setItemFormVisible(false)}
+        item={formSelectedItem}
       />
 
       <Drawer

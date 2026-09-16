@@ -1,5 +1,5 @@
-import { Drawer, Form, Input, InputNumber, Select, Switch, Button, Space, message, Typography } from "antd";
-import { POSItem, POSItemType } from "../types/pos.types";
+import { Drawer, Form, Input, InputNumber, Select, Switch, Button, Space, message, Typography, DatePicker } from "antd";
+import { POSItem } from "../types/pos.types";
 import { useEffect } from "react";
 import { usePOSStore } from "../store/pos.store";
 
@@ -57,6 +57,22 @@ export function ItemFormDrawer({ visible, onClose, item }: ItemFormDrawerProps) 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+      
+      // If physical item (medication), prepare its initial batch details
+      if (values.type === 'medication') {
+        const initialQty = values.stockQuantity || 0;
+        const batch = {
+          id: `b-${Math.floor(1000 + Math.random() * 9000)}`,
+          batchNumber: values.batchNumber || `BN${Math.floor(10000 + Math.random() * 90000)}`,
+          expiryDate: values.expiryDate ? values.expiryDate.format("YYYY-MM-DD") : new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0],
+          purchaseCost: values.purchaseCost || 0,
+          quantity: initialQty,
+          initialQuantity: initialQty,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        values.batches = [batch];
+      }
+
       if (isEdit && item) {
         await updateItem(item.id, values);
         message.success("Item updated successfully");
@@ -177,9 +193,27 @@ export function ItemFormDrawer({ visible, onClose, item }: ItemFormDrawerProps) 
                             <Form.Item name="reorderLevel" label="Reorder Level" className="mb-0">
                                 <InputNumber className="w-full" placeholder="e.g. 100" />
                             </Form.Item>
-                            <Form.Item name="stockQuantity" label="Initial Stock" className="mb-0" initialValue={0}>
-                                <InputNumber className="w-full" />
-                            </Form.Item>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Form.Item name="batchNumber" label="Batch Number" className="mb-0">
+                                    <Input placeholder="e.g. BN12345" />
+                                </Form.Item>
+                                <Form.Item name="expiryDate" label="Expiry Date" className="mb-0">
+                                    <DatePicker className="w-full" format="YYYY-MM-DD" placeholder="Select Expiry" />
+                                </Form.Item>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Form.Item name="purchaseCost" label="Purchase Cost" className="mb-0">
+                                    <InputNumber 
+                                        className="w-full"
+                                        formatter={value => `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                        parser={value => value!.replace(/₦\s?|(,*)/g, '') as any}
+                                        placeholder="e.g. 35"
+                                    />
+                                </Form.Item>
+                                <Form.Item name="stockQuantity" label="Initial Stock" className="mb-0" initialValue={0}>
+                                    <InputNumber className="w-full" />
+                                </Form.Item>
+                            </div>
                         </div>
                     );
                 }
