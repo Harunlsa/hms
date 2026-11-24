@@ -310,5 +310,43 @@ fn seed_initial_data(conn: &mut Connection) -> Result<()> {
         )?;
     }
 
+    // Check if sales table is empty
+    let sales_count: i64 = conn.query_row("SELECT COUNT(*) FROM sales", [], |r| r.get(0))?;
+    if sales_count == 0 {
+        conn.execute(
+            "INSERT INTO sales (
+                id, patient_id, patient_name, subtotal, total_discount, tax, total,
+                status, timestamp, processed_by_id, processed_by_name
+            ) VALUES 
+            ('SALE-1001', 'pat-001', 'Hassan Bello', 5100.0, 100.0, 0.0, 5000.0, 'completed', '2026-07-27T10:15:30Z', 'usr-001', 'Dr Hugh Mann'),
+            ('SALE-1002', NULL, 'Walk-in Patient', 3200.0, 0.0, 0.0, 3200.0, 'completed', '2026-07-27T12:30:00Z', 'usr-001', 'Dr Hugh Mann'),
+            ('SALE-1003', 'pat-002', 'Fatima Yusuf', 19500.0, 500.0, 0.0, 19000.0, 'completed', '2026-07-26T14:45:00Z', 'usr-002', 'Nurse Joy'),
+            ('SALE-1004', 'pat-003', 'Emeka Obi', 50000.0, 0.0, 0.0, 50000.0, 'completed', '2026-07-25T09:00:00Z', 'usr-001', 'Dr Hugh Mann')",
+            [],
+        )?;
+
+        conn.execute(
+            "INSERT INTO sale_line_items (id, sale_id, item_id, name, quantity, unit_price, discount, total) VALUES
+             ('li-001', 'SALE-1001', 'itm-004', 'Paracetamol 500mg', 2, 50.0, 0.0, 100.0),
+             ('li-002', 'SALE-1001', 'itm-001', 'General Consultation', 1, 5000.0, 0.0, 5000.0),
+             ('li-003', 'SALE-1002', 'itm-005', 'Amoxicillin 250mg', 1, 200.0, 0.0, 200.0),
+             ('li-004', 'SALE-1002', 'itm-007', 'Malaria Parasite Test', 1, 3000.0, 0.0, 3000.0),
+             ('li-005', 'SALE-1003', 'itm-002', 'Specialist Consultation', 1, 15000.0, 0.0, 15000.0),
+             ('li-006', 'SALE-1003', 'itm-006', 'Full Blood Count', 1, 4500.0, 0.0, 4500.0),
+             ('li-007', 'SALE-1004', 'itm-008', 'Private Ward Deposit', 1, 50000.0, 0.0, 50000.0)",
+            [],
+        )?;
+
+        conn.execute(
+            "INSERT INTO sale_payments (id, sale_id, method, amount, reference) VALUES
+             ('sp-001', 'SALE-1001', 'cash', 5000.0, NULL),
+             ('sp-002', 'SALE-1002', 'card', 3200.0, NULL),
+             ('sp-003', 'SALE-1003', 'transfer', 19000.0, NULL),
+             ('sp-004', 'SALE-1004', 'card', 30000.0, NULL),
+             ('sp-005', 'SALE-1004', 'cash', 20000.0, NULL)",
+            [],
+        )?;
+    }
+
     Ok(())
 }

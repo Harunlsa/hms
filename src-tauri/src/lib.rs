@@ -50,6 +50,19 @@ pub fn run() {
             is_file_number_taken,
             get_family_files,
             search_family_files,
+            get_pos_items,
+            get_pos_item_by_id,
+            create_pos_item,
+            update_pos_item,
+            update_pos_stock,
+            get_pos_inventory_movements,
+            get_all_pos_inventory_movements,
+            get_pos_inventory_stats,
+            create_pos_sale,
+            hold_pos_sale,
+            get_pos_sale_by_id,
+            get_pos_sales,
+            get_pos_held_sales,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

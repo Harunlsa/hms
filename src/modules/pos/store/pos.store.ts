@@ -8,7 +8,7 @@ import {
   InventoryStats,
   InventoryMovement
 } from "../types/pos.types";
-import { posMockRepo } from "../pos.mock";
+import { posApi as posMockRepo } from "../services/pos.api";
 import { POSSearchParams } from "../pos.repository";
 
 const CURRENT_ACTOR = { id: "usr-001", name: "Dr Hugh Mann" };
