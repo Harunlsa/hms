@@ -6,8 +6,8 @@ import {
   UpdatePatientInput,
 } from "../types/patient.types";
 import { FamilyFile } from "../types/family-file.types";
-import { patientMockRepo } from "../patient.mock";
-import { familyFileMockRepo } from "../family-file.mock";
+import { patientApi as patientMockRepo } from "../services/patient.api";
+import { familyFileApi as familyFileMockRepo } from "../services/family-file.api";
 import { PatientSearchParams } from "../patient.repository";
 import { Visit } from "../types/visit.types";
 import { Appointment } from "../types/appointment.types";
